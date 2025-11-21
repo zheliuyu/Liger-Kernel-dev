@@ -48,7 +48,7 @@ def train():
             custom_args.model_name,
             trust_remote_code=True,
             use_cache=False,
-            dtype=torch.bfloat16,
+            # dtype=torch.bfloat16,
             # These args will get passed to the appropriate apply_liger_kernel_to_* function
             # to override the default settings
             # cross_entropy=True,
@@ -59,14 +59,14 @@ def train():
             custom_args.model_name,
             trust_remote_code=True,
             use_cache=False,
-            dtype=torch.bfloat16,
+            # dtype=torch.bfloat16,
         )
 
     trainer = SFTTrainer(
         model=model,
         args=training_args,
         data_collator=collator,
-        max_seq_length=custom_args.max_seq_length,
+        # max_seq_length=custom_args.max_seq_length,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         formatting_func=formatting_prompts_func,
