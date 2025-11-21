@@ -1,11 +1,11 @@
 #!/bin/bash
 
-torchrun --nnodes=1 --nproc-per-node=4 training.py \
+torchrun --nnodes=1 --nproc-per-node=8 training.py \
     --model_name "Qwen/Qwen2-7B" \
     --bf16 \
     --num_train_epochs 1 \
-    --per_device_train_batch_size 48 \
-    --per_device_eval_batch_size 64 \
+    --per_device_train_batch_size 32 \
+    --per_device_eval_batch_size 24 \
     --eval_strategy "no" \
     --save_strategy "no" \
     --learning_rate 6e-6 \
