@@ -30,7 +30,9 @@ def get_optional_dependencies():
     """Get optional dependency groups."""
     return {
         "dev": [
-            "transformers>=4.49.0",
+            "torch==2.7.1"
+            "transformers==4.57.1",
+            "trl==0.19.1",
             "matplotlib>=3.7.2",
             "ruff>=0.12.0",
             "pytest>=7.1.2",
@@ -41,7 +43,7 @@ def get_optional_dependencies():
             "datasets>=2.19.2",
             "seaborn",
             "mkdocs-material",
-            "torchvision>=0.20",
+            "torchvision==0.22.1",
         ]
     }
 
