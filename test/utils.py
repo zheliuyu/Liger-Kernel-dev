@@ -134,6 +134,12 @@ def require_deterministic(test_case):
     return wrapper
 
 
+def as_float64(*tensors):
+    """The tensors in float64, on the CPU where the device has no such dtype."""
+    out = tuple(t.cpu().double() if t.device.type == "mps" else t.double() for t in tensors)
+    return out[0] if len(out) == 1 else out
+
+
 @torch.no_grad
 def get_logprobs(tensor):
     return torch.nn.functional.log_softmax(tensor, dim=-1, dtype=torch.float32)

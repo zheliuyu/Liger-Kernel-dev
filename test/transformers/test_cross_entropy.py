@@ -2,6 +2,7 @@ import pytest
 import torch
 import torch.nn.functional as F
 
+from test.utils import as_float64
 from test.utils import assert_verbose_allclose
 from test.utils import set_seed
 from test.utils import supports_bfloat16
@@ -1279,10 +1280,6 @@ def test_correctness_with_predicted_tokens(B, T, V, ignore_index, dtype):
     assert _input.grad is not None
 
 
-@pytest.mark.skipif(
-    device == "mps",
-    reason="PyTorch MPS has no float64; test uses .double() for true-class grad comparison",
-)
 @pytest.mark.parametrize(
     "dtype",
     [
@@ -1328,9 +1325,13 @@ def test_correctness_true_class_grad_confident_predictions(dtype, label_smoothin
     torch_ce(_input_ref, target).backward()
 
     rows = torch.arange(B * T, device=device)
-    ref = _input_ref.grad[rows, target].double()
-    torch_err = (_input.grad[rows, target].double() - ref).abs().max().item()
-    liger_err = (_input2.grad[rows, target].double() - ref).abs().max().item()
+    ref, torch_grad, liger_grad = as_float64(
+        _input_ref.grad[rows, target],
+        _input.grad[rows, target],
+        _input2.grad[rows, target],
+    )
+    torch_err = (torch_grad - ref).abs().max().item()
+    liger_err = (liger_grad - ref).abs().max().item()
 
     # Rounding the softmax term before the subtraction inflates this error by ~1/(1 - softmax(x_y)),
     # i.e. orders of magnitude, so a small constant factor over torch is a wide margin.
