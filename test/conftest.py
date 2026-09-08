@@ -54,3 +54,26 @@ def reset_liger_backend_selection():
         clear_available_cache()
     except Exception:
         pass
+
+
+# Modules that call torch.use_deterministic_algorithms(True) at import. Pytest
+# collection imports every test module first, so that process-global flag would
+# otherwise stay on for later files. MPS scatter_reduce / index_put have no
+# deterministic implementation and would raise.
+_DETERMINISTIC_ALGORITHM_MODULES = frozenset(
+    {
+        "test.transformers.test_attn_res",
+        "test.transformers.test_fused_add_rms_norm",
+        "test.transformers.test_modulated_rms_norm",
+        "test.transformers.test_poly_norm",
+        "test.transformers.test_rms_norm",
+    }
+)
+
+
+@pytest.fixture(autouse=True)
+def isolate_deterministic_algorithms(request):
+    """Re-apply each module's own deterministic setting, then clear the leak."""
+    torch.use_deterministic_algorithms(request.module.__name__ in _DETERMINISTIC_ALGORITHM_MODULES)
+    yield
+    torch.use_deterministic_algorithms(False)
