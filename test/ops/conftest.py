@@ -26,6 +26,7 @@ from liger_kernel.backends.dispatch import available_backends
 from liger_kernel.utils import infer_device
 
 _CUDA_OR_MPS_DEVICES = frozenset({"cuda", "mps"})
+device = infer_device()
 
 
 def cuda_or_mps_available() -> bool:
