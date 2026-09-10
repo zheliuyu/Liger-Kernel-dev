@@ -210,5 +210,7 @@ def get_total_gpu_memory() -> int:
         return torch.xpu.get_device_properties(0).total_memory // (1024**3)
     elif device == "npu":
         return torch.npu.get_device_properties(0).total_memory // (1024**3)
+    elif device == "mps":
+        return torch.mps.recommended_max_memory() // (1024**3)
     else:
         raise RuntimeError(f"Unsupported device: {device}")
