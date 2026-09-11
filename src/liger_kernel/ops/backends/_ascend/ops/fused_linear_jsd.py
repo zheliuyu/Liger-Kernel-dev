@@ -44,6 +44,8 @@ def fused_linear_jsd_forward(
     ignore_index,
     has_label,
     temperature,
+    jsd_impl=None,
+    jsd_mode=None,
     accum_dtype=None,
 ):
     device = student_input.device
@@ -215,6 +217,8 @@ class LigerFusedLinearJSDFunction(torch.autograd.Function):
         ignore_index: int = -100,
         temperature: float = 1.0,
         accum_dtype: Optional[torch.dtype] = None,
+        jsd_impl=None,
+        jsd_mode=None,
     ):
         """
         Args:
@@ -249,6 +253,8 @@ class LigerFusedLinearJSDFunction(torch.autograd.Function):
             ignore_index,
             has_label,
             temperature,
+            jsd_impl,
+            jsd_mode,
             accum_dtype,
         )
         # downcast to dtype and store for backward
@@ -263,4 +269,4 @@ class LigerFusedLinearJSDFunction(torch.autograd.Function):
     def backward(ctx, grad_output):
         (grad_input, grad_weight) = ctx.saved_tensors
         grad_input, grad_weight = fused_linear_jsd_backward(grad_output, grad_input, grad_weight)
-        return (grad_input, grad_weight, None, None, None, None, None, None, None)
+        return (grad_input, grad_weight, None, None, None, None, None, None, None, None, None)

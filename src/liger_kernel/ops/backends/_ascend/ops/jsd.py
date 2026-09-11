@@ -118,7 +118,7 @@ def get_optimal_block_size(total_elements):
         return 2048
 
 
-def jsd_forward(_input, target, shift_labels, beta, ignore_index, has_label):
+def jsd_forward(_input, target, shift_labels, beta, ignore_index, has_label, jsd_impl=None, jsd_mode=None):
     BT, V = _input.shape
     n_rows = BT
     BLOCK_SIZE = get_optimal_block_size(V)
@@ -191,6 +191,8 @@ class LigerJSDFunction(torch.autograd.Function):
         shift_labels: Optional[torch.Tensor] = None,
         beta: float = 0.5,
         ignore_index: int = -100,
+        jsd_impl=None,
+        jsd_mode=None,
     ) -> torch.Tensor:
         """
         Args:
@@ -211,7 +213,16 @@ class LigerJSDFunction(torch.autograd.Function):
             shift_labels = shift_labels.contiguous()
             has_label = True
 
-        loss, dX = jsd_forward(_input, target, shift_labels, beta, ignore_index, has_label)
+        loss, dX = jsd_forward(
+            _input,
+            target,
+            shift_labels,
+            beta,
+            ignore_index,
+            has_label,
+            jsd_impl,
+            jsd_mode,
+        )
         ctx.save_for_backward(dX)
         return loss
 
@@ -222,6 +233,8 @@ class LigerJSDFunction(torch.autograd.Function):
         dX = jsd_backward(dX, grad_output)
         return (
             dX,
+            None,
+            None,
             None,
             None,
             None,
